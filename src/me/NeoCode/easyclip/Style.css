@@ -1,0 +1,22 @@
+.button{
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ecf0f1;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-color: #2980b9;
+}
+
+#bpane {
+	-fx-background-color: #34495e;
+}
+
+#tfield {
+	-fx-background-color: #2c3e50;
+	-fx-text-fill: #ecf0f1;
+}
