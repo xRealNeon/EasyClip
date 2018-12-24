@@ -16,10 +16,13 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import javafx.scene.control.Alert.AlertType;
 
 public class Controller {
@@ -29,6 +32,7 @@ public class Controller {
 
 	@FXML
 	Button dlclip;
+	String name = "";
 
 	@FXML
 	private void initialize() {
@@ -49,67 +53,81 @@ public class Controller {
 				return;
 			}
 
-			System.out.println("Loading Clip " + getClipName());
-			JSONObject rootURL = new JSONObject(getVideoUrl());
-			String name = "";
+			dlclip.setDisable(true);
+			new Thread(new Runnable() {
 
-			try {
-				JSONObject rootClip = new JSONObject(getClip(getClipName()));
+				@Override
+				public void run() {
+					System.out.println("Loading Clip " + getClipName());
+					JSONObject rootURL = new JSONObject(getVideoUrl());
 
-				String format = formatting.getText();
+					try {
+						JSONObject rootClip = new JSONObject(getClip(getClipName()));
 
-				if (format.contains("%SLUG%")) {
-					format = format.replace("%SLUG%", rootClip.getString("slug"));
-				}
-				if (format.contains("%NAME%")) {
-					format = format.replace("%NAME%", rootClip.getString("title"));
-				}
-				if (format.contains("%BROADCASTER%")) {
-					format = format.replace("%BROADCASTER%", rootClip.getJSONObject("broadcaster").getString("name"));
-				}
-				if (format.contains("%CREATOR%")) {
-					format = format.replace("%CREATOR%", rootClip.getJSONObject("curator").getString("name"));
-				}
-				if (format.contains("%GAME%")) {
-					format = format.replace("%GAME%", rootClip.getString("game"));
-				}
-				if (format.contains("%DATE%")) {
-					format = format.replace("%DATE%", rootClip.getString("created_at"));
-				}
-				if (format.contains("%ID%")) {
-					format = format.replace("%ID%", rootClip.getString("tracking_id"));
-				}
+						String format = formatting.getText();
 
-				if (format.contains(":")) {
-					format = format.replace(":", "_");
-				}
-				if (format.contains("*")) {
-					format = format.replace("*", "_");
-				}
-				if (format.contains(".")) {
-					format = format.replace(".", "_");
-				}
-				if (format.contains(",")) {
-					format = format.replace(",", "_");
-				}
-				if (format.contains(";")) {
-					format = format.replace(";", "_");
-				}
+						if (format.contains("%SLUG%")) {
+							format = format.replace("%SLUG%", rootClip.getString("slug"));
+						}
+						if (format.contains("%NAME%")) {
+							format = format.replace("%NAME%", rootClip.getString("title"));
+						}
+						if (format.contains("%BROADCASTER%")) {
+							format = format.replace("%BROADCASTER%",
+									rootClip.getJSONObject("broadcaster").getString("name"));
+						}
+						if (format.contains("%CREATOR%")) {
+							format = format.replace("%CREATOR%", rootClip.getJSONObject("curator").getString("name"));
+						}
+						if (format.contains("%GAME%")) {
+							format = format.replace("%GAME%", rootClip.getString("game"));
+						}
+						if (format.contains("%DATE%")) {
+							format = format.replace("%DATE%", rootClip.getString("created_at"));
+						}
+						if (format.contains("%ID%")) {
+							format = format.replace("%ID%", rootClip.getString("tracking_id"));
+						}
 
-				name = format + ".mp4";
-			} catch (JSONException | IOException e1) {
-				e1.printStackTrace();
-			}
+						if (format.contains(":")) {
+							format = format.replace(":", "_");
+						}
+						if (format.contains("*")) {
+							format = format.replace("*", "_");
+						}
+						if (format.contains(";")) {
+							format = format.replace(";", "_");
+						}
+						if (format.contains("/")) {
+							format = format.replace("/", "_");
+						}
+						if (format.contains("|")) {
+							format = format.replace("|", "_");
+						}
+						if (format.contains("?")) {
+							format = format.replace("?", "_");
+						}
 
-			try {
-				System.out.println("Downloading Clip...");
-				saveUrl(System.getProperty("user.home") + "\\Videos\\EasyClip\\" + name,
-						rootURL.getJSONArray("quality_options").getJSONObject(0).getString("source"));
-				System.out.println("Clip saved as " + name);
-				showDialog("EasyClip", "Succsessfull", AlertType.INFORMATION, "Clip saved as " + name);
-			} catch (JSONException | IOException e) {
-				e.printStackTrace();
-			}
+						name = format + ".mp4";
+					} catch (JSONException | IOException e1) {
+						e1.printStackTrace();
+					}
+
+					try {
+						System.out.println("Downloading Clip...");
+						saveUrl(System.getProperty("user.home") + "\\Videos\\EasyClip\\" + name,
+								rootURL.getJSONArray("quality_options").getJSONObject(0).getString("source"));
+						System.out.println("Clip saved as " + name);
+						Platform.runLater(() -> {
+							showDialog("EasyClip", "Succsessfull", AlertType.INFORMATION, "Clip saved as " + name);
+							dlclip.setDisable(false);
+						});
+					} catch (JSONException | IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+
 		}));
 	}
 
@@ -119,9 +137,8 @@ public class Controller {
 		alert.setHeaderText(header);
 		alert.setContentText(text);
 		alert.getDialogPane().getScene().getWindow();
-		// Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		// stage.getIcons().add(new
-		// Image(UniversalHostsPatcher.class.getResourceAsStream("icon.png")));
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 		alert.showAndWait().ifPresent(rs -> {
 		});
 	}

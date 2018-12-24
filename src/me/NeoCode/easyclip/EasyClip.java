@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
 
@@ -27,9 +28,10 @@ public class EasyClip extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			BorderPane root = (BorderPane) FXMLLoader.load(getClass().getResource("Layout.fxml"));
-			Scene scene = new Scene(root, 425, 106);
+			Scene scene = new Scene(root, 417, 100);
 			scene.getStylesheets().add(getClass().getResource("Style.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 			primaryStage.setTitle("EasyClip v" + version);
 			primaryStage.setResizable(false);
 			primaryStage.show();
