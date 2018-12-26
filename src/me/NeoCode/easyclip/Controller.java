@@ -28,11 +28,11 @@ import javafx.scene.control.Alert.AlertType;
 public class Controller {
 
 	@FXML
-	TextField formatting;
+	private TextField formatting;
 
 	@FXML
-	Button dlclip;
-	String name = "";
+	private Button dlclip;
+	private String name = "";
 
 	@FXML
 	private void initialize() {
